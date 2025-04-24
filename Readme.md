@@ -1,7 +1,7 @@
 # Личный проект «Readme»
 
 * Студент: [Данила Ткаченко](https://up.htmlacademy.ru/nodejs-2/9/user/2506035).
-* Наставник: `Неизвестно`.
+* Наставник: `Руслан Семак`.(https://htmlacademy.ru/profile/id1451913).
 
 ---
 
