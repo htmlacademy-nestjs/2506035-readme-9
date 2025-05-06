@@ -10,7 +10,10 @@ const tseslint = require('typescript-eslint');
 const tsImportResolver = require('eslint-import-resolver-typescript');
 
 module.exports = [
-  ...tseslint.config(eslint.configs.recommended, ...tseslint.configs.recommended),
+  ...tseslint.config(
+    eslint.configs.recommended,
+    ...tseslint.configs.recommended,
+  ),
   eslintConfigPrettier,
   importPlugin.flatConfigs.recommended,
   {
@@ -26,8 +29,8 @@ module.exports = [
       sourceType: 'module',
 
       parserOptions: {
-        project: 'tsconfig.json',
-        projectService: true,
+        project: 'tsconfig.base.json',
+        tsconfigRootDir: __dirname,
       },
     },
     settings: {
