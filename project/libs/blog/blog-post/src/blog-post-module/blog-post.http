@@ -9,8 +9,8 @@ Content-Type: application/json
 
 {
   "type": "link",
-  "tags": ["umnyash"],
-  "link": "https://github.com/umnyash/1447627-readme-9",
+  "tags": ["danilatkachenko"],
+  "link": "https://github.com/danilatkachenko/2506035-readme-9",
   "linkDescription": "My project"
 }
 
@@ -22,8 +22,8 @@ Content-Type: application/json
 
 {
   "type": "photo",
-  "tags": ["umnyash"],
-  "photoUrl": "https://github.com/umnyash/1447627-readme-9"
+  "tags": ["danilatkachenko"],
+  "photoUrl": "https://github.com/danilatkachenko/2506035-readme-9"
 }
 
 ###
@@ -34,7 +34,7 @@ Content-Type: application/json
 
 {
   "type": "quote",
-  "tags": ["umnyash"],
+  "tags": ["danilatkachenko"],
   "quote": "Тысячи людей живут без любви, но никто — без воды.",
   "quoteAuthor": "Xью Оден"
 }
@@ -47,7 +47,7 @@ Content-Type: application/json
 
 {
   "type": "text",
-  "tags": ["umnyash"],
+  "tags": ["danilatkachenko"],
   "title": "Название публикации",
   "announcement": "Анонс публикации",
   "text": "Текст публикации.",
@@ -62,9 +62,9 @@ Content-Type: application/json
 
 {
   "type": "video",
-  "tags": ["umnyash"],
+  "tags": ["danilakachenko"],
   "title": "My project",
-  "videoUrl": "https://github.com/umnyash/1447627-readme-9"
+  "videoUrl": "https://github.com/danilatkachenko/2506035-readme-9"
 }
 
 ###
