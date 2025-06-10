@@ -1,9 +1,13 @@
 import { PostType } from './post-type.enum';
+import { Comment } from './comment.interface';
 
 interface BasePost {
   id?: string;
   tags: string[];
   type: PostType;
+  createdAt?: Date;
+  updatedAt?: Date;
+  comments: Comment[];
 }
 
 export interface LinkPost extends BasePost {
