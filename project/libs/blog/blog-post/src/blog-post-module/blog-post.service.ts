@@ -1,66 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { PostType } from '@project/core';
-import { Post } from '@project/core';
+import { PaginationResult } from '@project/core';
+import {
+  BlogCommentRepository,
+  CreateCommentDto,
+  BlogCommentEntity,
+  BlogCommentFactory
+} from '@project/blog-comment';
 
-import { BlogPostEntity } from './blog-post.entity';
 import { BlogPostRepository } from './blog-post.repository';
-import { CreateLinkPostDto } from '../dto/create-link-post.dto';
-import { CreatePhotoPostDto } from '../dto/create-photo-post.dto';
-import { CreateQuotePostDto } from '../dto/create-quote-post.dto';
-import { CreateTextPostDto } from '../dto/create-text-post.dto';
-import { CreateVideoPostDto } from '../dto/create-video-post.dto';
-
-type CreatePostDto = CreateLinkPostDto
-  | CreatePhotoPostDto
-  | CreateQuotePostDto
-  | CreateTextPostDto
-  | CreateVideoPostDto;
+import { CreatePostDto } from './dto/create-post.dto';
+import { BlogPostEntity } from './blog-post.entity';
+import { BlogPostQuery } from './blog-post.query';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { BlogPostFactory } from './blog-post.factory';
 
 @Injectable()
 export class BlogPostService {
   constructor(
-    private readonly blogPostRepository: BlogPostRepository
+    private readonly blogPostRepository: BlogPostRepository,
+    private readonly blogCommentRepository: BlogCommentRepository,
+    private readonly blogCommentFactory: BlogCommentFactory,
   ) { }
 
-  public async createPost<T extends CreatePostDto>(dto: T) {
-    let blogPost: CreatePostDto;
-    const { type, tags } = dto;
+  public async getAllPosts(query?: BlogPostQuery): Promise<PaginationResult<BlogPostEntity>> {
+    return this.blogPostRepository.find(query);
+  }
 
-    switch (type) {
-      case PostType.Link: {
-        const { link, linkDescription } = dto as CreateLinkPostDto;
-        blogPost = { type, tags, link, linkDescription };
-        break;
-      }
-      case PostType.Photo: {
-        const { photoUrl } = dto as CreatePhotoPostDto;
-        blogPost = { type, tags, photoUrl };
-        break;
-      }
-      case PostType.Quote: {
-        const { quote, quoteAuthor } = dto as CreateQuotePostDto;
-        blogPost = { type, tags, quote, quoteAuthor };
-        break;
-      }
-      case PostType.Text: {
-        const { title, text, announcement } = dto as CreateTextPostDto;
-        blogPost = { type, tags, title, text, announcement };
-        break;
-      }
-      case PostType.Video: {
-        const { title, videoUrl } = dto as CreateVideoPostDto;
-        blogPost = { type, tags, title, videoUrl };
-        break;
+  public async createPost(dto: CreatePostDto): Promise<BlogPostEntity> {
+    const newPost = BlogPostFactory.createFromCreatePostDto(dto);
+    await this.blogPostRepository.save(newPost);
+
+    return newPost;
+  }
+
+  public async deletePost(id: string): Promise<void> {
+    try {
+      await this.blogPostRepository.deleteById(id);
+    } catch {
+      throw new NotFoundException(`Post with ID ${id} not found`);
+    }
+  }
+
+  public async getPost(id: string): Promise<BlogPostEntity> {
+    return this.blogPostRepository.findById(id);
+  }
+
+  public async updatePost(id: string, dto: UpdatePostDto): Promise<BlogPostEntity> {
+    const existsPost = await this.blogPostRepository.findById(id);
+    let hasChanges = false;
+
+    for (const [key, value] of Object.entries(dto)) {
+      if (value !== undefined && existsPost[key] !== value) {
+        existsPost[key] = value;
+        hasChanges = true;
       }
     }
 
-    const postEntity = await new BlogPostEntity(blogPost as Post);
-    this.blogPostRepository.save(postEntity);
-    return postEntity;
+    if (!hasChanges) {
+      return existsPost;
+    }
+
+    await this.blogPostRepository.update(existsPost);
+
+    return existsPost;
   }
 
-  public async getPost(id: string) {
-    return this.blogPostRepository.findById(id);
+  public async addComment(postId: string, dto: CreateCommentDto): Promise<BlogCommentEntity> {
+    const existsPost = await this.getPost(postId);
+    const newComment = this.blogCommentFactory.createFromDto(dto, existsPost.id);
+    await this.blogCommentRepository.save(newComment);
+
+    return newComment;
   }
 }

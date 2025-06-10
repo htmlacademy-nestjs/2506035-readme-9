@@ -18,12 +18,14 @@
     "paths": {
       "@project/account-config": ["libs/account/account-config/src/index.ts"],
       "@project/authentication": ["libs/account/authentication/src/index.ts"],
+      "@project/blog-comment": ["libs/blog/blog-comment/src/index.ts"],
       "@project/blog-models": ["libs/blog/blog-models/src/index.ts"],
       "@project/blog-post": ["libs/blog/blog-post/src/index.ts"],
       "@project/blog-user": ["libs/account/blog-user/src/index.ts"],
       "@project/core": ["libs/shared/core/src/index.ts"],
       "@project/data-access": ["libs/shared/data-access/src/index.ts"],
-      "@project/helpers": ["libs/shared/helpers/src/index.ts"]
+      "@project/helpers": ["libs/shared/helpers/src/index.ts"],
+      "@project/pipes": ["libs/shared/pipes/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
