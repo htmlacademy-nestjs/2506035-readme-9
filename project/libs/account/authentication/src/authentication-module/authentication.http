@@ -12,7 +12,8 @@ Content-Type: application/json
 ###
 
 # Get user by ID
-GET http://localhost:3000/api/auth/ebeb0d6a-ede9-476b-bb15-4a8a2e35b9a5 HTTP/1.1
+GET http://localhost:3000/api/auth/6827f14566c5025f9dc3d708 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJGaXJzdCBhbmQgbGFzdCBuYW1lIiwiaWF0IjoxNzQ4MTE4MjM3LCJleHAiOjE3NDgxMTg1Mzd9.CajQZxqzFkvTsj_riiQDhdYNYBBOnXglK3eHNAe6V4o
 
 ###
 
@@ -24,5 +25,11 @@ Content-Type: application/json
   "email": "user-1@test.com",
   "password": "abc123"
 }
+
+###
+
+# Demo route for Pipe
+GET http://localhost:3000/api/auth/demo/1 HTTP/1.1.
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJGaXJzdCBhbmQgbGFzdCBuYW1lIiwiaWF0IjoxNzQ4MTE4NTg1LCJleHAiOjE3NDgxMTg4ODV9.20l0TKCwRGGkGa0F7l7XpgKxowqnbjPcGBuini6RUJk
 
 ###
