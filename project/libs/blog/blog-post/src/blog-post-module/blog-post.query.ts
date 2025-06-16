@@ -1,5 +1,5 @@
-import { Transform } from 'class-transformer';
-import { IsIn, IsNumber, IsOptional } from 'class-validator';
+import {Transform, Type} from 'class-transformer';
+import {IsEnum, IsNumber, IsOptional} from 'class-validator';
 
 import { SortDirection } from '@project/core';
 
@@ -10,12 +10,12 @@ import {
 } from './blog-post.constant';
 
 export class BlogPostQuery {
-  @Transform(({ value }) => +value || DEFAULT_POST_COUNT_LIMIT)
   @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   public limit = DEFAULT_POST_COUNT_LIMIT;
 
-  @IsIn(Object.values(SortDirection))
+  @IsEnum(SortDirection)
   @IsOptional()
   public sortDirection: SortDirection = DEFAULT_SORT_DIRECTION;
 
