@@ -1,0 +1,20 @@
+{
+  "name": "file-vault-config",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/file-vault/config/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/file-vault/config",
+        "tsConfig": "libs/file-vault/config/tsconfig.lib.json",
+        "packageJson": "libs/file-vault/config/package.json",
+        "main": "libs/file-vault/config/src/index.ts",
+        "assets": ["libs/file-vault/config/*.md"]
+      }
+    }
+  }
+}

@@ -23,5 +23,6 @@ export class CreatePostDto {
   public userId: string;
 
   @IsArray()
+  @IsString({ each: true })
   public tags: string[];
 }
