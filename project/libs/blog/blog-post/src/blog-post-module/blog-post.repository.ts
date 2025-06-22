@@ -1,28 +1,34 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, PostType, PostStatus } from '@prisma/client';
 
-import { PaginationResult, Post } from '@project/core';
 import { BasePostgresRepository } from '@project/data-access';
-import { PrismaClientService } from '@project/blog-models';
-
 import { BlogPostEntity } from './blog-post.entity';
+import { PaginationResult, Post, PostContent, SortDirection, SortType } from '@project/core';
 import { BlogPostFactory } from './blog-post.factory';
+import { PrismaClientService } from '@project/blog-models';
 import { BlogPostQuery } from './blog-post.query';
+
+const defaultInclude = {
+  tags: true,
+  _count: {
+    select: { favorite: true, comments: true },
+  },
+};
 
 @Injectable()
 export class BlogPostRepository extends BasePostgresRepository<BlogPostEntity, Post> {
   constructor(
     entityFactory: BlogPostFactory,
-    readonly client: PrismaClientService,
+    readonly client: PrismaClientService
   ) {
-    super(entityFactory, client)
+    super(entityFactory, client);
   }
 
   private async getPostCount(where: Prisma.PostWhereInput): Promise<number> {
     return this.client.post.count({ where });
   }
 
-  private calculatePostsPage(totalCount: number, limit: number): number {
+  private calculatePostsPages(totalCount: number, limit: number): number {
     return Math.ceil(totalCount / limit);
   }
 
@@ -31,10 +37,16 @@ export class BlogPostRepository extends BasePostgresRepository<BlogPostEntity, P
     const record = await this.client.post.create({
       data: {
         ...pojoEntity,
-        comments: {
-          connect: [],
-        }
-      }
+        id: undefined,
+        tags: {
+          connectOrCreate: pojoEntity?.tags
+            ? pojoEntity.tags.map((name) => ({
+              where: { name },
+              create: { name },
+            }))
+            : [],
+        },
+      },
     });
 
     entity.id = record.id;
@@ -43,8 +55,8 @@ export class BlogPostRepository extends BasePostgresRepository<BlogPostEntity, P
   public async deleteById(id: string): Promise<void> {
     await this.client.post.delete({
       where: {
-        id
-      }
+        id,
+      },
     });
   }
 
@@ -53,16 +65,14 @@ export class BlogPostRepository extends BasePostgresRepository<BlogPostEntity, P
       where: {
         id,
       },
-      include: {
-        comments: true,
-      }
+      include: defaultInclude,
     });
 
     if (!document) {
       throw new NotFoundException(`Post with id ${id} not found.`);
     }
 
-    return this.createEntityFromDocument(document);
+    return this.createEntityFromDocument(this.transformRawDocument(document));
   }
 
   public async update(entity: BlogPostEntity): Promise<void> {
@@ -71,43 +81,176 @@ export class BlogPostRepository extends BasePostgresRepository<BlogPostEntity, P
       where: { id: entity.id },
       data: {
         type: pojoEntity.type,
-        title: pojoEntity.title,
-        text: pojoEntity.text,
-        announcement: pojoEntity.announcement,
-        tags: pojoEntity.tags,
+        content: pojoEntity.content,
+        tags: {
+          connectOrCreate: pojoEntity.tags.map((name) => ({
+            where: { name },
+            create: { name },
+          })),
+          set: pojoEntity.tags.map((tag) => ({ name: tag })),
+        },
+        status: entity.status,
       },
-      include: {
-        comments: true,
-      }
+      include: defaultInclude,
     });
   }
 
-  public async find(query?: BlogPostQuery): Promise<PaginationResult<BlogPostEntity>> {
+  public async find(query?: BlogPostQuery, currentUserId?: string): Promise<PaginationResult<BlogPostEntity>> {
     const skip = query?.page && query?.limit ? (query.page - 1) * query.limit : undefined;
     const take = query?.limit;
     const where: Prisma.PostWhereInput = {};
     const orderBy: Prisma.PostOrderByWithRelationInput = {};
 
-    if (query?.sortDirection) {
-      orderBy.createdAt = query.sortDirection;
+    if (query?.tags) {
+      where.tags = {
+        some: {
+          name: {
+            in: query.tags,
+          },
+        },
+      };
+    }
+
+    if (query?.search) {
+      where.content = {
+        path: ['title'],
+        string_contains: query.search,
+      };
+    }
+
+    if (query?.userId) {
+      where.userId = query.userId;
+    }
+
+    if (query?.status) {
+      where.userId = currentUserId;
+      where.status = PostStatus.DRAFT;
+    } else {
+      where.status = PostStatus.PUBLISHED;
+    }
+
+    if (query?.type) {
+      where.type = query.type;
+    }
+
+    if (query?.sortBy) {
+      switch (query?.sortBy) {
+        case SortType.CreationDate:
+          orderBy.createdAt = query.sortDirection;
+          break;
+        case SortType.CommentsCount:
+          orderBy.comments = { _count: query.sortDirection };
+          break;
+        case SortType.LikesCount:
+          orderBy.favorite = { _count: query.sortDirection };
+          break;
+      }
     }
 
     const [records, postCount] = await Promise.all([
       this.client.post.findMany({
-        where, orderBy, skip, take,
-        include: {
-          comments: true,
-        },
+        where,
+        orderBy,
+        skip,
+        take,
+        include: defaultInclude,
       }),
       this.getPostCount(where),
     ]);
 
     return {
-      entities: records.map((record) => this.createEntityFromDocument(record)),
+      entities: records.map((record) =>
+        this.createEntityFromDocument(this.transformRawDocument(record))
+      ),
       currentPage: query?.page,
-      totalPages: this.calculatePostsPage(postCount, take),
+      totalPages: this.calculatePostsPages(postCount, take),
       itemsPerPage: take,
       totalItems: postCount,
+    };
+  }
+
+  public async addLike(userId: string, postId: string) {
+    const existsLike = await this.client.favorite.findFirst({
+      where: { userId, postId },
+    });
+
+    if (existsLike) return;
+
+    await this.client.favorite.create({
+      data: { userId, postId },
+    });
+  }
+
+  public async deleteLike(userId: string, postId: string) {
+    const existsLike = await this.client.favorite.findFirst({
+      where: { userId, postId },
+    });
+
+    if (!existsLike) return;
+
+    await this.client.favorite.delete({
+      where: {
+        userId_postId: { userId, postId },
+      },
+    });
+  }
+
+  public async getPostsToNotify() {
+    const lastNotify = await this.client.notification.findFirst({
+      orderBy: {
+        updatedAt: SortDirection.Desc,
+      },
+    });
+
+    const where: Prisma.PostWhereInput = {};
+
+    if (lastNotify) {
+      where.createdAt = { gt: lastNotify.updatedAt };
     }
+
+    const records = await this.client.post.findMany({
+      where,
+      orderBy: { createdAt: SortDirection.Desc },
+      include: defaultInclude,
+    });
+
+    return records.map((record) =>
+      this.createEntityFromDocument(this.transformRawDocument(record))
+    );
+  }
+
+  public async makeNotifyRecord() {
+    await this.client.notification.create({ data: {} });
+  }
+
+  private transformRawDocument(
+    document: {
+      tags: {
+        name: string;
+      }[];
+      _count: {
+        comments: number;
+        favorite: number;
+      };
+    } & {
+      id: string;
+      type: PostType;
+      content: Prisma.JsonValue;
+      status: PostStatus;
+      userId: string;
+      createdAt: Date;
+      updatedAt: Date;
+      isRepost: boolean;
+      originalPostId: string | null;
+      originalAuthorId: string | null;
+    }
+  ) {
+    return {
+      ...document,
+      tags: document.tags.map(({ name }) => name),
+      content: document.content as PostContent,
+      likesCount: document._count.favorite,
+      commentsCount: document._count.comments,
+    };
   }
 }

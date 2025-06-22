@@ -18,6 +18,7 @@ import { createJWTPayload } from '@project/helpers';
 
 import { CreateUserDto } from '../dto/create-user.dto';
 import { LoginUserDto } from '../dto/login-user.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 import { RefreshTokenService } from '../refresh-token-module/refresh-token.service';
 import { AUTH_USER_EXISTS, AUTH_USER_NOT_FOUND, AUTH_USER_PASSWORD_WRONG } from './authentication.constant';
 
@@ -42,7 +43,7 @@ export class AuthenticationService {
     }
 
     const userEntity = await new BlogUserEntity(blogUser).setPassword(password);
-    this.blogUserRepository.save(userEntity);
+    await this.blogUserRepository.save(userEntity);
 
     return userEntity;
   }
@@ -99,5 +100,75 @@ export class AuthenticationService {
     }
 
     return existUser;
+  }
+
+  public async changePassword(id: string, dto: ChangePasswordDto) {
+    const { currentPassword, newPassword } = dto;
+    const existUser = await this.blogUserRepository.findById(id);
+
+    if (!existUser) {
+      throw new UnauthorizedException(AUTH_USER_NOT_FOUND);
+    }
+
+    if (!(await existUser.comparePassword(currentPassword))) {
+      throw new UnauthorizedException(AUTH_USER_PASSWORD_WRONG);
+    }
+
+    await existUser.setPassword(newPassword);
+
+    await this.blogUserRepository.update(existUser);
+
+    return existUser;
+  }
+
+  public async toggleSubscription(followerId: string, followingId: string) {
+    const follower = await this.blogUserRepository.findById(followerId);
+
+    if (!follower) {
+      throw new NotFoundException(`User with id ${followerId} not found`);
+    }
+
+    const following = await this.blogUserRepository.findById(followingId);
+
+    if (!following) {
+      throw new NotFoundException(`User with id ${followingId} not found`);
+    }
+
+    if (follower.subscriptions.includes(followingId)) {
+      follower.subscriptions = follower.subscriptions.filter((id) => id !== followingId);
+      following.subscribersCount--;
+    } else {
+      follower.subscriptions.push(followingId);
+      following.subscribersCount++;
+    }
+
+    await Promise.all([
+      this.blogUserRepository.update(follower),
+      this.blogUserRepository.update(following),
+    ]);
+
+    return follower;
+  }
+
+  public async incrementPostsCount(userId: string) {
+    const existUser = await this.blogUserRepository.findById(userId);
+
+    if (!existUser) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    existUser.postsCount++;
+    await this.blogUserRepository.update(existUser);
+  }
+
+  public async decrementPostsCount(userId: string) {
+    const existUser = await this.blogUserRepository.findById(userId);
+
+    if (!existUser) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    existUser.postsCount--;
+    await this.blogUserRepository.update(existUser);
   }
 }

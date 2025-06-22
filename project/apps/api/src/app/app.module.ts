@@ -8,6 +8,7 @@ import {
 import { UsersController } from './users.controller';
 import { CheckAuthGuard } from './guards/check-auth.guard';
 import { BlogController } from './blog.controller';
+import { CommentController } from './comment.controller';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { BlogController } from './blog.controller';
   controllers: [
     UsersController,
     BlogController,
+    CommentController
   ],
   providers: [CheckAuthGuard],
 })

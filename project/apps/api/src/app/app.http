@@ -1,31 +1,208 @@
-# Login user by email and password
+# Create user
+POST http://localhost:3000/api/users/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "user-1@test.com",
+  "name": "User 1",
+  "password": "abc123"
+}
+
+###
+
+# Create user with avatar
+POST http://localhost:3000/api/users/register HTTP/1.1
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="email"
+
+user-2@test.com
+--boundary
+Content-Disposition: form-data; name="password"
+
+abc123
+--boundary
+Content-Disposition: form-data; name="name"
+
+User 2
+--boundary
+Content-Disposition: form-data; name="avatar"; filename="photo.jpg"
+Content-Type: image/jpeg
+
+< ./photo.jpg
+--boundary--
+
+###
+
+# Login user
 POST http://localhost:3000/api/users/login HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "user@notfound.local",
-  "password": "123456"
+  "email": "user-2@test.com",
+  "password": "abc123"
+}
+
+###
+
+# Change password
+POST http://localhost:3000/api/users/password HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODNkMjNlMjYyZTZhOWNlNDRlN2MyYjYiLCJlbWFpbCI6Imtla3NAbm90Zm91bmQubG9jYWwiLCJuYW1lIjoiS2VrcyIsImlhdCI6MTc0ODgzNzY1NCwiZXhwIjoxNzQ4ODM3OTU0fQ.c0j2hOS8MPo556z4q3dm68kqBq39mZrElJJqKlsGbbs
+Content-Type: application/json
+
+{
+  "currentPassword": "abc123",
+  "newPassword": "abc1234"
 }
 
 ###
 
 # Get new JWT pair
 POST http://localhost:3000/api/users/refresh HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJlbWFpbCI6InVzZXJAbm90Zm91bmQubG9jYWwiLCJyb2xlIjoidXNlciIsImxhc3RuYW1lIjoiU21pdGgiLCJmaXJzdG5hbWUiOiJLZWtzIiwidG9rZW5JZCI6IjBiMzk0NDA1LWM0ZTQtNGRmMy04NGNjLTg4ZTI5YTRiOGJkZiIsImlhdCI6MTcxNDY2NDEwOSwiZXhwIjoxNzE3MjU2MTA5fQ.A_-yL6zgW1H6VJbfMzXpQvJnK5flYjpwYOZiCxybnio
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODNkYjk2MzYxZGQxMDIyMmY1YWEyMGQiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJ0b2tlbklkIjoiMmE2NDkzYmMtMGY3Zi00YzE0LWIzMWUtYWY4YmVhYmFlNDZhIiwiaWF0IjoxNzQ4ODc3MDQxLCJleHAiOjE3NTE0NjkwNDF9.iW8QgLw6GrET2m7FOVHei-4fyazXCVlV1ho8lveNLMM
 
 ###
 
-# Create a new post
-POST http://localhost:3000/api/blog HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NDQwMzJmYmU0Y2FlYjg2OGM2ZWVjMzYiLCJlbWFpbCI6InVzZXJAbm90Zm91bmQubG9jYWwiLCJyb2xlIjoidXNlciIsImxhc3RuYW1lIjoiU21pdGgiLCJmaXJzdG5hbWUiOiJLZWtzIiwiaWF0IjoxNjgzMTI0MTA5LCJleHAiOjE2ODMxMjQ3MDl9.oHiIvy7hGEuDaI7e7Jspbcd68_5CMKNe2qzkMV6bDe8
+# Get user detail info
+GET http://localhost:3000/api/users/68409f9f7e1b6e38c2eb5e94 HTTP/1.1
+
+###
+
+# Toggle subcription
+POST http://localhost:3000/api/users/toggle-subscribe/683dbe4561dd10222f5aa210 HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODNkYjk2MzYxZGQxMDIyMmY1YWEyMGQiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJpYXQiOjE3NDg4NzcwNDEsImV4cCI6MTc0ODg3NzM0MX0.WxNqzvUQVJG24QVKyToTIJUvDKZrInYvnNfevV9uMmk
+
+###
+
+# Create new TEXT post
+POST http://localhost:3000/api/posts HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODQwOWY4YzdlMWI2ZTM4YzJlYjVlOTEiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJpYXQiOjE3NDkwNjYwMjIsImV4cCI6MTc0OTA2NjMyMn0.K8Clg_aqzC_7ngWx9e56sFa7-qlipfdcfLCfDvRqWOs
 Content-Type: application/json
 
 {
   "type": "TEXT",
-  "title": "Название публикации",
-  "announcement": "Текст анонса",
-  "text": "Расширенный текст публикации",
-  "userId": "6581762309c030b503e30512",
-  "tags": ["Проверка", "Сложно"]
+  "tags": ["javascript", "api"],
+  "content": {
+    "title": "Всё, что нужно знать о работе с API",
+    "announcement": "Работа с API — это основа веб-разработки. Разберём работу с API на практике: от базовых запросов до обработки ошибок и аутентификации.",
+    "text": "API — это интерфейс взаимодействия между различными приложениями. Например, ваш фронтенд запрашивает данные о погоде у внешнего сервера через API, получает их в виде JSON и отображает пользователю."
+  }
 }
+
+###
+
+# Create new PHOTO post
+POST http://localhost:3000/api/posts HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODNmNWU1OWMwNWZlMzliYzliZjNjZWYiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJpYXQiOjE3NDg5ODY2MTMsImV4cCI6MTc0ODk4NjkxM30.RbW6ZX5rYwFbji2yFmwjgcSXk3UWEjyDQbXsMXhd4_I
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="type"
+
+PHOTO
+--boundary
+Content-Disposition: form-data; name="file"; filename="photo.jpg"
+Content-Type: image/jpeg
+
+< ./photo.jpg
+--boundary--
+
+###
+
+# Get all posts
+GET http://localhost:3000/api/posts HTTP/1.1
+
+###
+
+# Get sorted posts
+
+GET http://localhost:3000/api/posts?limit=2&sortDirection=desc&page=1&search=API HTTP/1.1
+
+###
+
+# Get posts by type
+
+GET http://localhost:3002/api/posts?type=PHOTO HTTP/1.1
+
+###
+
+# Get posts by tag
+
+GET http://localhost:3002/api/posts?tags=javascript HTTP/1.1
+
+###
+
+# Get post by id
+GET http://localhost:3000/api/posts/ebe6ed71-450c-49c2-ad1a-cf14179a8b88 HTTP/1.1
+
+###
+
+# Update a post
+PATCH http://localhost:3000/api/posts/556c1ccc-8e29-4b48-8124-47866191db12 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODNmNWU1OWMwNWZlMzliYzliZjNjZWYiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJpYXQiOjE3NDg5ODM1MjYsImV4cCI6MTc0ODk4MzgyNn0.8Kl7fQtLyTEkHCQL-1l-8dGlk9S1_MeOyea1l0R44wg
+Content-Type: application/json
+
+{
+  "type": "TEXT",
+  "tags": ["javascript", "api"],
+  "content": {
+    "title": "Всё, что нужно знать о работе с API в JavaScript",
+    "announcement": "Работа с API — это основа веб-разработки. Разберём работу с API на практике: от базовых запросов до обработки ошибок и аутентификации.",
+    "text": "API (Application Programming Interface) — это интерфейс взаимодействия между различными приложениями. Например, ваш фронтенд запрашивает данные о погоде у внешнего сервера через API, получает их в виде JSON и отображает пользователю."
+  }
+}
+
+###
+
+# Delete a post
+DELETE http://localhost:3000/api/posts/b049575c-f84b-4ef8-9ea3-ddf92ce608ea HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODQwOWY5ZjdlMWI2ZTM4YzJlYjVlOTQiLCJlbWFpbCI6InVzZXItMkB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDIiLCJpYXQiOjE3NDkwNjYxMjksImV4cCI6MTc0OTA2NjQyOX0.PxrstnsDg80KAt8dLaqJi2IsKw91PKO38V7KDO7A8Bc
+
+###
+
+# Repost
+POST http://localhost:3000/api/posts/repost/0115b8c8-68b1-4cfd-823b-3f8ee0f03e17 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODQwOWY5ZjdlMWI2ZTM4YzJlYjVlOTQiLCJlbWFpbCI6InVzZXItMkB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDIiLCJpYXQiOjE3NDkwNjY3MzMsImV4cCI6MTc0OTA2NzAzM30.PNn8ScGNaSd38-b0SR1B9bUUMnOyhCi57s4GFK0oiQU
+
+###
+
+# Create comment
+POST http://localhost:3000/api/posts/5ff03168-eddc-4f3a-8dfa-b668a1aaf64b/comments HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODQwOWY4YzdlMWI2ZTM4YzJlYjVlOTEiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJpYXQiOjE3NDkwNjU2OTksImV4cCI6MTc0OTA2NTk5OX0.YFKvCTLfFvrXHVAt1gO7qkUCcbri-IUyM4uFgxPHjjU
+Content-Type: application/json
+
+{
+  "text": "Хорошая статья, Кекс."
+}
+
+###
+
+# Get post comments
+GET http://localhost:3000/api/posts/5ff03168-eddc-4f3a-8dfa-b668a1aaf64b/comments HTTP/1.1
+
+###
+
+# Delete comment
+DELETE  http://localhost:3000/api/comments/332d71bf-d6dd-4fae-9023-060b1908ae24 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODQwOWY4YzdlMWI2ZTM4YzJlYjVlOTEiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJpYXQiOjE3NDkwNjU2OTksImV4cCI6MTc0OTA2NTk5OX0.YFKvCTLfFvrXHVAt1gO7qkUCcbri-IUyM4uFgxPHjjU
+
+###
+
+# Add like
+POST http://localhost:3000/api/posts/addLike/41d58f66-00ec-494a-80c1-46841a8b3127 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODNmNWU1OWMwNWZlMzliYzliZjNjZWYiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJpYXQiOjE3NDg5ODY2MTMsImV4cCI6MTc0ODk4NjkxM30.RbW6ZX5rYwFbji2yFmwjgcSXk3UWEjyDQbXsMXhd4_I
+
+###
+
+# Remove like
+POST http://localhost:3000/api/posts/deleteLike/41d58f66-00ec-494a-80c1-46841a8b3127 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODNmNWU1OWMwNWZlMzliYzliZjNjZWYiLCJlbWFpbCI6InVzZXItMUB0ZXN0LmNvbSIsIm5hbWUiOiJVc2VyIDEiLCJpYXQiOjE3NDg5ODY2MTMsImV4cCI6MTc0ODk4NjkxM30.RbW6ZX5rYwFbji2yFmwjgcSXk3UWEjyDQbXsMXhd4_I
+
+###
+
+# Send new posts notifications
+GET http://localhost:3000/api/posts/notify HTTP/1.1
+
 ###

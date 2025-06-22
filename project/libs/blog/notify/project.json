@@ -1,0 +1,20 @@
+{
+  "name": "blog-notify",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/blog/notify/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/blog/notify",
+        "tsConfig": "libs/blog/notify/tsconfig.lib.json",
+        "packageJson": "libs/blog/notify/package.json",
+        "main": "libs/blog/notify/src/index.ts",
+        "assets": ["libs/blog/notify/*.md"]
+      }
+    }
+  }
+}

@@ -2,10 +2,10 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 
-import { Subscriber } from '@project/core';
+import { Subscriber, Post } from '@project/core';
 import { NotifyConfig } from '@project/notify-config';
 
-import { EMAIL_ADD_SUBSCRIBER_SUBJECT } from './mail.constant';
+import { EMAIL_ADD_SUBSCRIBER_SUBJECT, EMAIL_NEW_POSTS_SUBJECT } from './mail.constant';
 
 @Injectable()
 export class MailService {
@@ -25,5 +25,30 @@ export class MailService {
         email: `${subscriber.email}`,
       }
     })
+  }
+
+  public async sendNotifyNewPosts(posts: Post[], subscriber: Subscriber) {
+    if (posts?.length) {
+      await this.mailerService.sendMail({
+        from: this.notifyConfig.mail.from,
+        to: subscriber.email,
+        subject: EMAIL_NEW_POSTS_SUBJECT,
+        template: './new-posts',
+        context: {
+          user: `${subscriber.name}`,
+          posts,
+        },
+      });
+    } else {
+      await this.mailerService.sendMail({
+        from: this.notifyConfig.mail.from,
+        to: subscriber.email,
+        subject: EMAIL_NEW_POSTS_SUBJECT,
+        template: './no-new-posts',
+        context: {
+          user: `${subscriber.name}`,
+        },
+      });
+    }
   }
 }

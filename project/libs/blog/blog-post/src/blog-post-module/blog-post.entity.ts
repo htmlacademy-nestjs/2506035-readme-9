@@ -1,17 +1,19 @@
-import { Entity, Post, StorableEntity } from '@project/core';
-import { BlogCommentEntity, BlogCommentFactory } from '@project/blog-comment';
-import { PostType } from '@prisma/client';
+import { Entity, Post, StorableEntity, PostContent } from '@project/core';
+import { PostType, PostStatus } from '@prisma/client';
 
 export class BlogPostEntity extends Entity implements StorableEntity<Post> {
   public type: PostType;
-  public title: string;
-  public announcement: string;
-  public text: string;
-  public comments: BlogCommentEntity[];
+  public content: PostContent;
   public tags: string[];
+  public commentsCount: number;
+  public likesCount: number;
+  public status: PostStatus;
   public userId: string;
   public createdAt?: Date;
   public updatedAt?: Date;
+  public isRepost: boolean;
+  public originalPostId?: string;
+  public originalAuthorId?: string;
 
   constructor(post?: Post) {
     super();
@@ -25,34 +27,34 @@ export class BlogPostEntity extends Entity implements StorableEntity<Post> {
 
     this.id = post.id ?? undefined;
     this.type = post.type;
-    this.title = post.title;
-    this.announcement = post.announcement;
-    this.text = post.text;
-    this.comments = [];
+    this.content = post.content;
     this.tags = post.tags;
+    this.commentsCount = post.commentsCount;
+    this.likesCount = post.likesCount;
+    this.status = post.status;
     this.userId = post.userId;
     this.createdAt = post.createdAt;
     this.updatedAt = post.updatedAt;
-
-    const blogCommentFactory = new BlogCommentFactory();
-    for (const comment of post.comments) {
-      const blogCommentEntity = blogCommentFactory.create(comment);
-      this.comments.push(blogCommentEntity);
-    }
+    this.isRepost = post.isRepost;
+    this.originalPostId = post.originalPostId;
+    this.originalAuthorId = post.originalAuthorId;
   }
 
   public toPOJO(): Post {
     return {
       id: this.id,
       type: this.type,
-      title: this.title,
-      announcement: this.announcement,
-      text: this.text,
-      comments: this.comments.map((commentEntity) => commentEntity.toPOJO()),
+      content: this.content,
       tags: this.tags,
+      commentsCount: this.commentsCount,
+      likesCount: this.likesCount,
+      status: this.status,
       userId: this.userId,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
+      isRepost: this.isRepost,
+      originalPostId: this.originalPostId,
+      originalAuthorId: this.originalAuthorId,
     }
   }
 }

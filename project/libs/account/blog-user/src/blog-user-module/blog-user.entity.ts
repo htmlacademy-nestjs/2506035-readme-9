@@ -6,8 +6,12 @@ import { SALT_ROUNDS } from './blog-user.constant';
 export class BlogUserEntity extends Entity implements StorableEntity<AuthUser> {
   public email: string;
   public name: string;
-  public avatar: string;
+  public avatar?: string;
   public passwordHash: string;
+  public postsCount: number;
+  public subscribersCount: number;
+  public subscriptions: string[];
+  public createdAt?: string;
 
   constructor(user?: AuthUser) {
     super();
@@ -19,11 +23,15 @@ export class BlogUserEntity extends Entity implements StorableEntity<AuthUser> {
       return;
     }
 
-    this.id = user.id ?? '';
+    this.id = user.id ?? undefined;
     this.email = user.email;
     this.name = user.name;
-    this.avatar = user.avatar ?? '';
+    this.avatar = user.avatar;
     this.passwordHash = user.passwordHash;
+    this.postsCount = user.postsCount ?? 0;
+    this.subscriptions = user.subscriptions ?? [];
+    this.subscribersCount = user.subscribersCount ?? 0;
+    this.createdAt = user.createdAt;
   }
 
   public toPOJO(): AuthUser {
@@ -31,8 +39,12 @@ export class BlogUserEntity extends Entity implements StorableEntity<AuthUser> {
       id: this.id,
       email: this.email,
       name: this.name,
+      avatar: this.avatar,
       passwordHash: this.passwordHash,
-      ...(this.avatar && { avatar: this.avatar })
+      postsCount: this.postsCount,
+      subscriptions: this.subscriptions,
+      subscribersCount: this.subscribersCount,
+      createdAt: this.createdAt,
     }
   }
 

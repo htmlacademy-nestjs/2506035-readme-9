@@ -1,0 +1,10 @@
+<h2>Hello, {{user}}! New posts:</h2>
+<ul class='post-list'>
+  {{#each posts}}
+  <li>
+    <a href='http://localhost:3000/api/posts/{{this.id}}'>
+      {{this.type}} post by {{this.userId}}
+    </a>
+  </li>
+  {{/each}}
+</ul>

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { EntityFactory, Post } from '@project/core';
+import { PostStatus } from '@prisma/client';
 
 import { BlogPostEntity } from './blog-post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -14,12 +15,11 @@ export class BlogPostFactory implements EntityFactory<BlogPostEntity> {
   public static createFromCreatePostDto(dto: CreatePostDto): BlogPostEntity {
     const entity = new BlogPostEntity();
     entity.type = dto.type;
-    entity.title = dto.title;
-    entity.announcement = dto.announcement;
-    entity.text = dto.text;
-    entity.userId = dto.userId;
+    entity.content = dto.content;
     entity.tags = dto.tags;
-    entity.comments = [];
+    entity.status = PostStatus.PUBLISHED;
+    entity.userId = dto.userId;
+    entity.isRepost = false;
 
     return entity;
   }

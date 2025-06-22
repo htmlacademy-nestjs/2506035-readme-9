@@ -1,4 +1,11 @@
-# Get all comments for post
-GET http://localhost:3000/api/posts/ab04593b-da99-4fe3-8b4b-e06d82e2efdd/comments HTTP/1.1
+# Get comment by Id
+
+GET http://localhost:3000/api/comments/ab04593b-da99-4fe3-8b4b-e06d82e2efdd HTTP/1.1
+
+###
+
+# Delete a comment by id
+
+DELETE http://localhost:3000/api/comments/ab04593b-da99-4fe3-8b4b-e06d82e2efdd HTTP/1.1
 
 ###
