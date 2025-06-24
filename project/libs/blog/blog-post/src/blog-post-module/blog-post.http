@@ -5,6 +5,8 @@ GET http://localhost:3002/api/posts HTTP/1.1
 
 # Get posts with filter
 
+# GET http://localhost:3002/api/posts?limit=2&sortDirection=desc&categories[]=39614113-7ad5-45b6-8093-06455437e1e2&page=1 HTTP/1.1
+
 GET http://localhost:3002/api/posts?limit=2&sortDirection=desc&page=1 HTTP/1.1
 
 ###
@@ -20,11 +22,13 @@ Content-Type: application/json
 
 {
   "type": "TEXT",
-  "title": "Публикация №3",
-  "announcement": "Текст анонса",
-  "text": "Расширенный текст публикации",
-  "userId": "6581762309c030b503e30512",
-  "tags": ["Проверка", "Сложно"]
+  "content": {
+    "title": "Публиация №3",
+    "announcement": "Текст анонса",
+    "text": "Расширенный текст публикации",
+  },
+  "tags": ["Проверка", "Сложно"],
+  "userId": "6581762309c030b503e30512"
 }
 
 ###
@@ -39,8 +43,14 @@ PATCH http://localhost:3002/api/posts/6d308040-96a2-4162-bea6-2338e9976540 HTTP/
 Content-Type: application/json
 
 {
-  "title": "Как дела",
-  "text": "И вновь привет"
+  "type": "TEXT",
+  "content": {
+    "title": "Публикация №3",
+    "announcement": "Текст анонса публикации",
+    "text": "Расширенный текст публикации. Расширенный текст публикации."
+  },
+  "tags": ["Проверка", "Сложно", "Лето"],
+  "userId": "6581762309c030b503e30512"
 }
 
 ###

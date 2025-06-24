@@ -10,7 +10,7 @@ export class UserRdo {
   public id: string;
 
   @ApiProperty({
-    description: 'User unique address',
+    description: 'User unique email address',
     example: 'rs@gmail.com'
   })
   @Expose()
@@ -26,6 +26,7 @@ export class UserRdo {
   @ApiProperty({
     description: 'User avatar url',
     example: 'avatar.jpg',
+    required: false
   })
   @Expose()
   public avatar?: string;

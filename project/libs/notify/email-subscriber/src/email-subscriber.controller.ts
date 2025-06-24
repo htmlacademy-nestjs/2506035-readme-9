@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 
-import { RabbitRouting } from '@project/core';
+import { RabbitRouting, Post } from '@project/core';
 
 import { EmailSubscriberService } from './email-subscriber.service';
 import { CreateSubscriberDto } from './dto/create-subscriber.dto';
@@ -11,16 +11,40 @@ import { MailService } from './mail-module/mail.service';
 export class EmailSubscriberController {
   constructor(
     private readonly subscriberService: EmailSubscriberService,
-    private readonly mailService: MailService,
+    private readonly mailService: MailService
   ) { }
 
   @RabbitSubscribe({
-    exchange: 'readme.notify.income',
-    routingKey: RabbitRouting.AddSubscriber,
+    exchange: 'readme.notify',
+    routingKey: RabbitRouting.SubscriberCreated,
     queue: 'readme.notify.income',
   })
-  public async create(subscriber: CreateSubscriberDto) {
-    this.subscriberService.addSubscriber(subscriber);
-    this.mailService.sendNotifyNewSubscriber(subscriber);
+  public async create(data: { type: string; subscriber: CreateSubscriberDto }) {
+    if (data?.type !== RabbitRouting.SubscriberCreated) {
+      return;
+    };
+
+    await this.subscriberService.addSubscriber(data.subscriber);
+    await this.mailService.sendNotifyNewSubscriber(data.subscriber);
+  }
+
+  @RabbitSubscribe({
+    exchange: 'readme.notify',
+    routingKey: RabbitRouting.NewPostsPublished,
+    queue: 'readme.notify.income',
+  })
+  public async notifyNewPosts(data: { type: string; posts: Post[] }) {
+    if (data?.type !== RabbitRouting.NewPostsPublished) {
+      return;
+    };
+
+    const subscribers = await this.subscriberService.getAllSubscribers();
+
+    for (const subscriber of subscribers) {
+      await this.mailService.sendNotifyNewPosts(
+        data?.posts,
+        subscriber.toPOJO()
+      );
+    }
   }
 }

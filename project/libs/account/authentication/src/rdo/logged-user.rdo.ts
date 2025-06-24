@@ -10,7 +10,7 @@ export class LoggedUserRdo {
   public id: string;
 
   @ApiProperty({
-    description: 'User unique address',
+    description: 'User unique email address',
     example: 'rs@gmail.com'
   })
   @Expose()
@@ -25,6 +25,7 @@ export class LoggedUserRdo {
 
   @ApiProperty({
     description: 'Refresh token',
+    example: 'b2xpdmVyLmNvbm5lckBnbWFpbC5jb20='
   })
   @Expose()
   public refreshToken: string;

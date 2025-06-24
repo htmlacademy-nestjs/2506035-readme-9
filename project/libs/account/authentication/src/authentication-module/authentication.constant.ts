@@ -9,6 +9,14 @@ export const AuthenticationResponseMessage = {
   UserNotFound: 'User not found',
   UserExist: 'User with the email already exists',
   UserCreated: 'The new user has been successfully created.',
+  PasswordChanged: 'Password was successfully changed.',
+  PasswordChangeError: 'Authentication failed or old password is wrong.',
+  RefreshSuccess: 'Refresh and access tokens have been successfully updated.',
+  RefreshError: 'Wrong refresh token',
+  SubsciptionSucess: 'Subscribe or unsubscribe successfully.',
+  JwtAuthError: 'JWT authentification failed.',
+  PostsCountSuccess: 'Posts count has been successfully changed.',
+  ServerError: 'Internal server error.',
 } as const;
 
 export const AuthenticationValidateMessage = {

@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator'
+import { IsEmail, IsMongoId, IsOptional, IsString, Length } from 'class-validator'
 
 import { AuthenticationValidateMessage } from '../authentication-module/authentication.constant';
 
 export class CreateUserDto {
   @ApiProperty({
-    description: 'User unique address',
+    description: 'User unique email address',
     example: 'rs@gmail.com'
   })
   @IsEmail({}, { message: AuthenticationValidateMessage.EmailNotValid })
@@ -16,6 +16,7 @@ export class CreateUserDto {
     example: 'R S',
   })
   @IsString()
+  @Length(3, 50)
   name: string;
 
   @ApiProperty({
@@ -23,12 +24,16 @@ export class CreateUserDto {
     example: '123456',
   })
   @IsString()
+  @Length(6, 12)
   password: string;
 
   @ApiProperty({
-    description: 'User avatar url',
-    example: 'avatar.jpg',
+    description: 'User avatar file id',
+    example: '6581762309c030b503e30512',
+    required: false,
   })
+  @IsMongoId()
+  @IsOptional()
   @IsString()
   avatar?: string;
 }

@@ -18,7 +18,7 @@ export function getMailerAsyncOptions(optionSpace: string): MailerAsyncOptions {
           }
         },
         defaults: {
-          from: configService.get<string>('mail.from'),
+          from: configService.get<string>(`${optionSpace}.from`),
         },
         template: {
           dir: resolve(__dirname, 'assets'),
