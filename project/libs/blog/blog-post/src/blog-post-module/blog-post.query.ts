@@ -18,6 +18,7 @@ export class BlogPostQuery {
     required: false,
     default: DEFAULT_POST_COUNT_LIMIT,
   })
+  @Transform(({ value }) => +value || DEFAULT_POST_COUNT_LIMIT)
   @IsNumber()
   @Type(() => Number)
   @IsOptional()
@@ -87,10 +88,12 @@ export class BlogPostQuery {
   public status?: PostStatus;
 
   @ApiProperty({
-    description: 'User ID',
+    description: 'User IDs',
     required: false,
   })
-  @IsMongoId()
+  @IsMongoId({ each: true })
+  @IsArray()
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   @IsOptional()
-  public userId?: string;
+  public userIds?: string[];
 }
